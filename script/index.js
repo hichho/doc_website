@@ -63,9 +63,8 @@ async function mergeConfig() {
   const readDir = util.promisify(fs.readdir);
   try {
     //查找doc目录下的所有word文档
-    const files = await readDir('../docFile');
+    const files = await readDir('/var/project/doc_website/docFile');
     console.log(files,'files...')
-    
     files.forEach(file => {
       if (file.endsWith('.docx') || file.endsWith('.doc')) {
         fileNames.push("../docFile/" + file);
