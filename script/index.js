@@ -37,6 +37,8 @@ async function convertDocToMd(docPath, outputPath) {
       })
     })
 
+    console.log('ffffff');
+
     let htmlContent = result.value;
     const html = template.slice(0, positionToInsert) + htmlContent + template.slice(positionToInsert);
     const markdownContent = turndownService.turndown(html);
@@ -48,7 +50,7 @@ async function convertDocToMd(docPath, outputPath) {
       }
     })
   } catch (e) {
-    console.log(e, '123');
+    console.log(e, '转换发生错误');
   }
 }
 
@@ -64,13 +66,11 @@ async function mergeConfig() {
   try {
     //查找doc目录下的所有word文档
     const files = await readDir('/var/project/doc_website/docFile');
-    console.log(files,'files...')
     files.forEach(file => {
       if (file.endsWith('.docx') || file.endsWith('.doc')) {
         fileNames.push("/var/project/doc_website/docFile/" + file);
       }
     });
-    console.log(fileNames,'fileNames...');
     //将word文档跟配置对比，合并&生成相应的配置文件
     fileNames.forEach((item, index) => {
       const targetConfig = projectConfig.find(unit => unit.docPath === item);
@@ -79,7 +79,6 @@ async function mergeConfig() {
       } else {
         // 使用正则表达式匹配文件名部分
         const fileNameMatch = item.match(/\/([^/]+)\.\w+$/);
-        console.log(fileNameMatch,'every filename');
         config.push({
           name: fileNameMatch[1],
           docPath: item,
@@ -111,12 +110,9 @@ async function productDumiConfig(configs) {
 async function processFiles() {
   try {
     const configs = await mergeConfig();
-    console.log(configs,'i am configs');
     const projectConvertPromiseFn = configs.map(async (item) => {
       try {
-        console.log(item)
         await convertDocToMd(item.docPath, item.outputPath);
-
       } catch (error) {
         console.error('转换时发生错误:', error);
       }
@@ -124,10 +120,8 @@ async function processFiles() {
 
     // 所有doc转换成md完成
     await Promise.all(projectConvertPromiseFn);
-    console.log('所有文件转换完成');
     //生成dumi配置
     await productDumiConfig(configs);
-    console.log('dumi配置生成完成')
   } catch (error) {
     console.error('处理文件时发生错误:', error);
   }
