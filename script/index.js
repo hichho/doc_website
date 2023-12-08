@@ -108,7 +108,7 @@ async function productDumiConfig(configs) {
 async function processFiles() {
   try {
     const configs = await mergeConfig();
-
+    console.log(configs,'i am configs');
     const projectConvertPromiseFn = configs.map(async (item) => {
       try {
         console.log(item)
