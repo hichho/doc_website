@@ -67,7 +67,7 @@ async function mergeConfig() {
     console.log(files,'files...')
     files.forEach(file => {
       if (file.endsWith('.docx') || file.endsWith('.doc')) {
-        fileNames.push("../docFile/" + file);
+        fileNames.push("/var/project/doc_website/docFile/" + file);
       }
     });
     console.log(fileNames,'fileNames...');
@@ -83,7 +83,7 @@ async function mergeConfig() {
         config.push({
           name: fileNameMatch[1],
           docPath: item,
-          outputPath: '../docs/doc_' + index,
+          outputPath: '/var/project/doc_website/docs/doc_' + index,
           navTitle: fileNameMatch[1],
           navLink: '/doc_' + index
         })
