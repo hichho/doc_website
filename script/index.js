@@ -64,11 +64,14 @@ async function mergeConfig() {
   try {
     //查找doc目录下的所有word文档
     const files = await readDir('../docFile');
+    console.log(files,'files...')
+    
     files.forEach(file => {
       if (file.endsWith('.docx') || file.endsWith('.doc')) {
         fileNames.push("../docFile/" + file);
       }
     });
+    console.log(fileNames,'fileNames...');
     //将word文档跟配置对比，合并&生成相应的配置文件
     fileNames.forEach((item, index) => {
       const targetConfig = projectConfig.find(unit => unit.docPath === item);
@@ -77,6 +80,7 @@ async function mergeConfig() {
       } else {
         // 使用正则表达式匹配文件名部分
         const fileNameMatch = item.match(/\/([^/]+)\.\w+$/);
+        console.log(fileNameMatch,'every filename');
         config.push({
           name: fileNameMatch[1],
           docPath: item,
@@ -85,7 +89,7 @@ async function mergeConfig() {
           navLink: '/doc_' + index
         })
       }
-    })
+    });
     return config;
   } catch (err) {
     console.error('无法读取目录内容:', err);
