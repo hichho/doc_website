@@ -24,6 +24,7 @@ async function convertDocToMd(docPath, outputPath) {
     try {
       const result = await mammoth.convertToHtml({ path: docPath }, {
         convertImage: mammoth.images.imgElement(async (image) => {
+          console.log(image,'图片')
           const imageBuffer = await image.read('base64');
           const imageExtension = image.contentType.split('/')[1];
           //如果有符合类型的图片类型
@@ -36,7 +37,9 @@ async function convertDocToMd(docPath, outputPath) {
             }
           }
         })
-      })
+      });
+
+      console.log(result,'结果');
     } catch (e) {
       console.log(e,'转html时发生错误');
     }
@@ -53,7 +56,7 @@ async function convertDocToMd(docPath, outputPath) {
       }
     })
   } catch (e) {
-    console.log(e, '转换发生错误');
+    // console.log(e, '转换发生错误');
   }
 }
 
