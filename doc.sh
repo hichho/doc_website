@@ -4,6 +4,9 @@ source_directory="/var/ftp/admin/doc"
 destination_directory="/var/project/doc_website/docFile"
 script_directory="/var/project/doc_website/script"
 
+# 等待文件传输完成
+sleep 15  # 可以根据实际情况调整等待时间
+
 # 监听文件变化并执行拷贝和脚本
 /usr/bin/inotifywait -m -r -e create,moved_to "$source_directory" |
 while read path action file; do
