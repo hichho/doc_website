@@ -21,21 +21,25 @@ async function convertDocToMd(docPath, outputPath) {
     if (!fs.existsSync(outputPath + '/' + imageFolderPath)) {
       fs.mkdirSync(outputPath + '/' + imageFolderPath);
     }
-    const result = await mammoth.convertToHtml({ path: docPath }, {
-      convertImage: mammoth.images.imgElement(async (image) => {
-        const imageBuffer = await image.read('base64');
-        const imageExtension = image.contentType.split('/')[1];
-        //如果有符合类型的图片类型
-        if (Boolean(imageType.find(type => type === imageExtension))) {
-          const imageName = `image_&${Date.now()}.${imageExtension}`;
-          const imagePath = path.join(outputPath + '/' + imageFolderPath, imageName);
-          fs.writeFileSync(imagePath, imageBuffer, 'base64');
-          return {
-            src: './' + imageFolderPath + '/' + imageName
+    try {
+      const result = await mammoth.convertToHtml({ path: docPath }, {
+        convertImage: mammoth.images.imgElement(async (image) => {
+          const imageBuffer = await image.read('base64');
+          const imageExtension = image.contentType.split('/')[1];
+          //如果有符合类型的图片类型
+          if (Boolean(imageType.find(type => type === imageExtension))) {
+            const imageName = `image_&${Date.now()}.${imageExtension}`;
+            const imagePath = path.join(outputPath + '/' + imageFolderPath, imageName);
+            fs.writeFileSync(imagePath, imageBuffer, 'base64');
+            return {
+              src: './' + imageFolderPath + '/' + imageName
+            }
           }
-        }
+        })
       })
-    })
+    } catch (e) {
+      console.log(e,'转html时发生错误');
+    }
 
 
     let htmlContent = result.value;
