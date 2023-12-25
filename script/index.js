@@ -37,7 +37,6 @@ async function convertDocToMd(docPath, outputPath) {
       })
     })
 
-    console.log('ffffff');
 
     let htmlContent = result.value;
     const html = template.slice(0, positionToInsert) + htmlContent + template.slice(positionToInsert);
