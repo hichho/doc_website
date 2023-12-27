@@ -12,7 +12,6 @@ const turndownService = new turndown();
 let docFileDir = '';
 let targetDir = '';
 
-console.log(process.env, 'process');
 
 if (process.env.NODE_ENV === 'development') {
   docFileDir = path.resolve(__dirname, process.env.DOC_DIR);
