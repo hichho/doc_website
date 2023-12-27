@@ -11,8 +11,8 @@ while true; do
   # 等待文件变化
   /usr/bin/inotifywait -q -e create -e delete -e move -r "$source_directory"
 
-  # 同步源目录到目标目录
-  rsync -av --delete "$source_directory/" "$destination_directory/"
+  # 同步源目录到目标目录（包括子目录和文件）
+  rsync -r -u "$source_directory/" "$destination_directory/"
   echo "Files synchronized from $source_directory to $destination_directory"
 
   # 执行脚本操作
