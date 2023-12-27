@@ -1,5 +1,4 @@
 #!/bin/bash
-
 source_directory="/var/ftp/admin/doc"
 destination_directory="/var/project/doc_website/docFile"
 script_directory="/var/project/doc_website/script"
@@ -20,6 +19,9 @@ initial_timestamp=$(date +%s)
     difference=$((current_timestamp - initial_timestamp))
 
     if [ $difference -ge 10 ]; then
+        # 输出目录内容以便调试
+        ls -la "$source_directory/"
+
         # 执行拷贝操作
         cp -r "$source_directory"/* "$destination_directory/"
         echo "Files copied to $destination_directory"

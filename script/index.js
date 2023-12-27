@@ -132,6 +132,7 @@ async function productDumiConfig(configs) {
 async function processFiles() {
   try {
     const configs = await mergeConfig();
+    console.log(configs);
     const projectConvertPromiseFn = configs.map(async (item) => {
       try {
         await convertDocToMd(item.docPath, item.outputPath);

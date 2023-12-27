@@ -10,3 +10,4 @@ public/logo.png
 script/navConfig.json
 yarn.lock
 .idea
+pnpm-lock.yaml
