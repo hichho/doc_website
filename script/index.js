@@ -11,19 +11,18 @@ const turndownService = new turndown();
 
 let docFileDir = '';
 let targetDir = '';
+let configDir = '';
 
 
 if (process.env.NODE_ENV === 'development') {
-  docFileDir = path.resolve(__dirname, process.env.DOC_DIR);
-  targetDir = path.resolve(__dirname, process.env.TARGET_DIR);
+  docFileDir = path.resolve(__dirname, process.env.DEV_DOC_DIR);
+  targetDir = path.resolve(__dirname, process.env.DEV_TARGET_DIR);
+  configDir = path.resolve(__dirname, process.env.DEV_CONFIG_FILE);
 }
 if (process.env.NODE_ENV === 'production') {
-  docFileDir = process.env.DOC_DIR;
-  targetDir = process.env.TARGET_DIR;
-}
-if (process.env.NODE_ENV === undefined) {
-  docFileDir = '/var/project/doc_website/docFile';
-  targetDir = '/var/project/doc_website/docs/doc_';
+  docFileDir = process.env.PRO_DOC_DIR;
+  targetDir = process.env.PRO_TARGET_DIR;
+  configDir = process.env.DEV_CONFIG_FILE;
 }
 
 console.log(docFileDir, targetDir, 'dirPath');
@@ -120,14 +119,19 @@ async function mergeConfig() {
 }
 
 async function productDumiConfig(configs) {
-  let configJSON = [];
-  configs.forEach(obj => {
-    configJSON.push({ title: obj.navTitle, link: obj.navLink });
-  });
-  const jsons = JSON.stringify(configJSON, null, 2);
-  fs.writeFile('./navConfig.json', jsons, 'utf-8', (err) => {
-    console.log(err);
-  });
+  try {
+    let configJSON = [];
+    configs.forEach(obj => {
+      configJSON.push({ title: obj.navTitle, link: obj.navLink });
+    });
+    const jsons = JSON.stringify(configJSON, null, 2);
+    console.log(jsons, 'jjjjj');
+    fs.writeFile(configDir, jsons, 'utf-8', (err) => {
+      console.log(err);
+    });
+  } catch (e) {
+    console.log(e, '保存dumi配置时错误')
+  }
 }
 
 
@@ -135,7 +139,6 @@ async function productDumiConfig(configs) {
 async function processFiles() {
   try {
     const configs = await mergeConfig();
-    console.log(configs, 'config');
     const projectConvertPromiseFn = configs.map(async (item) => {
       try {
         await convertDocToMd(item.docPath, item.outputPath);
