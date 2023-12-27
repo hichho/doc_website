@@ -8,3 +8,5 @@ public/logo.png
 /docs
 /script/navConfig.json
 script/navConfig.json
+yarn.lock
+.idea
