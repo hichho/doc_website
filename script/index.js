@@ -12,7 +12,7 @@ const turndownService = new turndown();
 let docFileDir = '';
 let targetDir = '';
 
-console.log(process.env.NODE_ENV,'process');
+console.log(process.env, 'process');
 
 if (process.env.NODE_ENV === 'development') {
   docFileDir = path.resolve(__dirname, process.env.DOC_DIR);
@@ -22,8 +22,12 @@ if (process.env.NODE_ENV === 'production') {
   docFileDir = process.env.DOC_DIR;
   targetDir = process.env.TARGET_DIR;
 }
+if (process.env.NODE_ENV === undefined) {
+  docFileDir = '/var/project/doc_website/docFile';
+  targetDir = '/var/project/doc_website/docs/doc_';
+}
 
-console.log(docFileDir, targetDir,'dirPath');
+console.log(docFileDir, targetDir, 'dirPath');
 
 /**
  * 为单个项目的doc转换为md
@@ -132,7 +136,7 @@ async function productDumiConfig(configs) {
 async function processFiles() {
   try {
     const configs = await mergeConfig();
-    console.log(configs,'config');
+    console.log(configs, 'config');
     const projectConvertPromiseFn = configs.map(async (item) => {
       try {
         await convertDocToMd(item.docPath, item.outputPath);
