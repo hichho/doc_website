@@ -89,7 +89,7 @@ async function mergeConfig() {
   const readDir = util.promisify(fs.readdir);
   try {
     //查找doc目录下的所有word文档
-    console.log(docFileDir, 'word文档');
+    console.log('1111',docFileDir, 'word文档222');
     const files = await readDir(docFileDir);
     files.forEach(file => {
       console.log(file, JSON.stringify(file), 'file')
