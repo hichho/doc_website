@@ -36,30 +36,25 @@ async function convertDocToMd(docPath, outputPath) {
     //转成html的结果
     let result = null;
     try {
-      console.log('docPathhhh', docPath, 'docPathhhh')
       result = await mammoth.convertToHtml({ path: docPath }, {
         convertImage: mammoth.images.imgElement(async (image) => {
-          try {
-            const imageBuffer = await image.read('base64');
-            const imageExtension = image.contentType.split('/')[1];
-            //如果有符合类型的图片类型
-            if (Boolean(imageType.find(type => type === imageExtension))) {
-              const imageName = `image_&${Date.now()}.${imageExtension}`;
-              const imagePath = path.join(outputPath + '/' + imageFolderPath, imageName);
-              fs.writeFileSync(imagePath, imageBuffer, 'base64');
-              return {
-                src: './' + imageFolderPath + '/' + imageName
-              }
+          const imageBuffer = await image.read('base64');
+          const imageExtension = image.contentType.split('/')[1];
+          //如果有符合类型的图片类型
+          if (Boolean(imageType.find(type => type === imageExtension))) {
+            const imageName = `image_&${Date.now()}.${imageExtension}`;
+            const imagePath = path.join(outputPath + '/' + imageFolderPath, imageName);
+            fs.writeFileSync(imagePath, imageBuffer, 'base64');
+            return {
+              src: './' + imageFolderPath + '/' + imageName
             }
-          } catch (e) {
-            console.log('converInner', e, 'converInner')
           }
         })
       });
     } catch (e) {
-      console.log(e, '转html时发生错误');
+      console.log(e, 'word转html时发生错误');
     }
-    console.log(result)
+    console.log('html结果', result, 'html结果')
 
     let htmlContent = result.value;
     const html = template.slice(0, positionToInsert) + htmlContent + template.slice(positionToInsert);
@@ -72,7 +67,7 @@ async function convertDocToMd(docPath, outputPath) {
       }
     })
   } catch (e) {
-    console.log('转换html时发生错误', e);
+    console.log('最后转md时发生错误', e);
   }
 }
 
