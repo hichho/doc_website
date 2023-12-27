@@ -36,7 +36,7 @@ async function convertDocToMd(docPath, outputPath) {
     //转成html的结果
     let result = null;
     try {
-      console.log('docPathhhh',docPath,'docPathhhh')
+      console.log('docPathhhh', docPath, 'docPathhhh')
       result = await mammoth.convertToHtml({ path: docPath }, {
         convertImage: mammoth.images.imgElement(async (image) => {
           const imageBuffer = await image.read('base64');
@@ -55,7 +55,7 @@ async function convertDocToMd(docPath, outputPath) {
     } catch (e) {
       console.log(e, '转html时发生错误');
     }
-
+    console.log(result)
 
     let htmlContent = result.value;
     const html = template.slice(0, positionToInsert) + htmlContent + template.slice(positionToInsert);
