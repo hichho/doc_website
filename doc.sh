@@ -6,7 +6,7 @@ script_directory="/var/project/doc_website/script"
 # 设置初始时间戳
 initial_timestamp=$(date +%s)
 
-# 同步文件夹并监听文件变化并执行脚本
+# 同步文件夹并监听文件变化
 while true; do
   # 等待文件变化
   /usr/bin/inotifywait -q -e create -e delete -e move -r "$source_directory"
@@ -20,12 +20,21 @@ while true; do
 
   # 如果源目录与目标目录内容相同
   if [ -z "$diff_output" ]; then
-    # 执行脚本操作
-    cd "$script_directory" || exit
-    node index.js
-    cd - || exit
+    # 记录同步完成时间戳
+    sync_end_timestamp=$(date +%s)
 
-    # 结束循环，任务完成
-    break
+    # 检查同步完成后是否经过一段时间，用于确保所有文件已复制
+    time_difference=$((sync_end_timestamp - initial_timestamp))
+
+    # 如果已经经过一段时间（比如5秒），则执行脚本
+    if [ $time_difference -ge 5 ]; then
+      # 执行脚本操作
+      cd "$script_directory" || exit
+      node index.js
+      cd - || exit
+
+      # 结束循环，任务完成
+      break
+    fi
   fi
 done
