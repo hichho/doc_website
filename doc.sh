@@ -23,12 +23,21 @@ while true; do
 
   # 如果源目录与目标目录内容相同
   if [ -z "$diff_output" ]; then
-    # 执行脚本操作
-    cd "$script_directory" || exit
-    node index.js
-    cd - || exit
+    # 等待一段时间以确保所有文件都已复制（可根据需要调整等待时间）
+    sleep 5
 
-    # 结束循环，任务完成
-    break
+    # 检查目标目录是否有新的文件添加
+    new_files=$(diff -qr "$source_directory" "$destination_directory" | grep "Only in $source_directory")
+
+    # 如果没有新文件添加，执行脚本操作
+    if [ -z "$new_files" ]; then
+      # 执行脚本操作
+      cd "$script_directory" || exit
+      node index.js
+      cd - || exit
+
+      # 结束循环，任务完成
+      break
+    fi
   fi
 done
