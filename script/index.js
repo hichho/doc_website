@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === 'development') {
   targetDir = path.resolve(__dirname, process.env.DEV_TARGET_DIR);
   configDir = path.resolve(__dirname, process.env.DEV_CONFIG_FILE);
 }
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === undefined) {
   docFileDir = process.env.PRO_DOC_DIR;
   targetDir = process.env.PRO_TARGET_DIR;
   configDir = process.env.DEV_CONFIG_FILE;
@@ -89,7 +89,7 @@ async function mergeConfig() {
   const readDir = util.promisify(fs.readdir);
   try {
     //查找doc目录下的所有word文档
-    console.log('1111',docFileDir, 'word文档222');
+    console.log('1111', docFileDir, 'word文档222');
     const files = await readDir(docFileDir);
     files.forEach(file => {
       console.log(file, JSON.stringify(file), 'file')
