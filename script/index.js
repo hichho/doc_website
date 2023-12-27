@@ -91,6 +91,7 @@ async function mergeConfig() {
     //查找doc目录下的所有word文档
     const files = await readDir(docFileDir);
     files.forEach(file => {
+      console.log(file,JSON.stringify(file),'file')
       if (file.endsWith('.docx') || file.endsWith('.doc')) {
         fileNames.push(docFileDir + "/" + file);
       }
