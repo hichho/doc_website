@@ -19,7 +19,6 @@ if (process.env.NODE_ENV === 'development') {
   configDir = path.resolve(__dirname, process.env.DEV_CONFIG_FILE);
 }
 
-console.log(docFileDir, targetDir, 'dirPath');
 
 /**
  * 为单个项目的doc转换为md
@@ -37,6 +36,7 @@ async function convertDocToMd(docPath, outputPath) {
     //转成html的结果
     let result = null;
     try {
+      console.log('docPathhhh',docPath,'docPathhhh')
       result = await mammoth.convertToHtml({ path: docPath }, {
         convertImage: mammoth.images.imgElement(async (image) => {
           const imageBuffer = await image.read('base64');
@@ -83,10 +83,8 @@ async function mergeConfig() {
   const readDir = util.promisify(fs.readdir);
   try {
     //查找doc目录下的所有word文档
-    console.log('1111', docFileDir, 'word文档222');
     const files = await readDir(docFileDir);
     files.forEach(file => {
-      console.log(file, JSON.stringify(file), 'file')
       if (file.endsWith('.docx') || file.endsWith('.doc')) {
         fileNames.push(docFileDir + "/" + file);
       }
@@ -121,7 +119,6 @@ async function productDumiConfig(configs) {
       configJSON.push({ title: obj.navTitle, link: obj.navLink });
     });
     const jsons = JSON.stringify(configJSON, null, 2);
-    console.log(jsons, 'jjjjj');
     fs.writeFile(configDir, jsons, 'utf-8', (err) => {
       console.log(err);
     });
