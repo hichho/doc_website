@@ -6,29 +6,20 @@ script_directory="/var/project/doc_website/script"
 # 设置初始时间戳
 initial_timestamp=$(date +%s)
 
-# 监听文件变化并执行拷贝和脚本
+# 同步文件夹并监听文件变化并执行脚本
 while true; do
   # 等待文件变化
-  /usr/bin/inotifywait -q -e create -r "$source_directory"
+  /usr/bin/inotifywait -q -e create -e delete -e move -r "$source_directory"
 
-  # 检查文件是否在最后10秒内有新的改动
-  current_timestamp=$(date +%s)
-  difference=$((current_timestamp - initial_timestamp))
+  # 同步源目录到目标目录
+  rsync -av --delete "$source_directory/" "$destination_directory/"
+  echo "Files synchronized from $source_directory to $destination_directory"
 
-  if [ $difference -ge 10 ]; then
-    # 输出目录内容以便调试
-    ls -la "$source_directory/"
+  # 执行脚本操作
+  cd "$script_directory" || exit
+  node index.js
+  cd - || exit
 
-    # 执行拷贝操作
-    cp -r "$source_directory"/* "$destination_directory/"
-    echo "Files copied to $destination_directory"
-
-    # 执行脚本操作
-    cd "$script_directory" || exit
-    node index.js
-    cd - || exit
-
-    # 更新时间戳
-    initial_timestamp=$(date +%s)
-  fi
+  # 更新时间戳
+  initial_timestamp=$(date +%s)
 done
