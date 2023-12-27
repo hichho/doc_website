@@ -3,10 +3,27 @@ const fs = require('fs');
 const path = require('path');
 const turndown = require('turndown');
 const constants = require('./config.js');
+require('dotenv').config();
 const util = require('util');
 const { projectConfig, imageFolderPath, positionToInsert, template, imageType } = constants;
 //html->md 工具
 const turndownService = new turndown();
+
+let docFileDir = '';
+let targetDir = '';
+
+console.log(process.env.NODE_ENV);
+
+if (process.env.NODE_ENV === 'development') {
+  docFileDir = path.resolve(__dirname, process.env.DOC_DIR);
+  targetDir = path.resolve(__dirname, process.env.TARGET_DIR);
+}
+if (process.env.NODE_ENV === 'production') {
+  docFileDir = process.env.DOC_DIR;
+  targetDir = process.env.TARGET_DIR;
+}
+
+console.log(docFileDir, targetDir);
 
 /**
  * 为单个项目的doc转换为md
@@ -21,10 +38,11 @@ async function convertDocToMd(docPath, outputPath) {
     if (!fs.existsSync(outputPath + '/' + imageFolderPath)) {
       fs.mkdirSync(outputPath + '/' + imageFolderPath);
     }
+    //转成html的结果
+    let result = null;
     try {
-      const result = await mammoth.convertToHtml({ path: docPath }, {
+      result = await mammoth.convertToHtml({ path: docPath }, {
         convertImage: mammoth.images.imgElement(async (image) => {
-          console.log(image,'图片')
           const imageBuffer = await image.read('base64');
           const imageExtension = image.contentType.split('/')[1];
           //如果有符合类型的图片类型
@@ -38,10 +56,8 @@ async function convertDocToMd(docPath, outputPath) {
           }
         })
       });
-
-      console.log(result,'结果');
     } catch (e) {
-      console.log(e,'转html时发生错误');
+      console.log(e, '转html时发生错误');
     }
 
 
@@ -56,7 +72,7 @@ async function convertDocToMd(docPath, outputPath) {
       }
     })
   } catch (e) {
-    // console.log(e, '转换发生错误');
+    console.log('转换html时发生错误', e);
   }
 }
 
@@ -71,10 +87,10 @@ async function mergeConfig() {
   const readDir = util.promisify(fs.readdir);
   try {
     //查找doc目录下的所有word文档
-    const files = await readDir('/var/project/doc_website/docFile');
+    const files = await readDir(docFileDir);
     files.forEach(file => {
       if (file.endsWith('.docx') || file.endsWith('.doc')) {
-        fileNames.push("/var/project/doc_website/docFile/" + file);
+        fileNames.push(docFileDir + "/" + file);
       }
     });
     //将word文档跟配置对比，合并&生成相应的配置文件
@@ -88,7 +104,7 @@ async function mergeConfig() {
         config.push({
           name: fileNameMatch[1],
           docPath: item,
-          outputPath: '/var/project/doc_website/docs/doc_' + index,
+          outputPath: targetDir + index,
           navTitle: fileNameMatch[1],
           navLink: '/doc_' + index
         })
@@ -96,7 +112,7 @@ async function mergeConfig() {
     });
     return config;
   } catch (err) {
-    console.error('无法读取目录内容:', err);
+    console.error('合并配置时发生错误:', err);
   }
 }
 
@@ -120,7 +136,7 @@ async function processFiles() {
       try {
         await convertDocToMd(item.docPath, item.outputPath);
       } catch (error) {
-        console.error('转换时发生错误:', error);
+        console.error('docs->html->md发生错误:', error);
       }
     });
 
@@ -129,7 +145,7 @@ async function processFiles() {
     //生成dumi配置
     await productDumiConfig(configs);
   } catch (error) {
-    console.error('处理文件时发生错误:', error);
+    console.error('最终错误:', error);
   }
 }
 processFiles();
