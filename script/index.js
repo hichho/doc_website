@@ -9,16 +9,15 @@ const { projectConfig, imageFolderPath, positionToInsert, template, imageType } 
 //html->md 工具
 const turndownService = new turndown();
 
-let docFileDir = process.env.PRO_DOC_DIR;
-let targetDir = process.env.PRO_TARGET_DIR;
-let configDir = process.env.DEV_CONFIG_FILE;
+let docFileDir = '/var/project/doc_website/docFile';
+let targetDir = '/var/project/doc_website/docs/doc_';
+let configDir = '/var/project/doc_website/script/navConfig.json';
 
 if (process.env.NODE_ENV === 'development') {
   docFileDir = path.resolve(__dirname, process.env.DEV_DOC_DIR);
   targetDir = path.resolve(__dirname, process.env.DEV_TARGET_DIR);
   configDir = path.resolve(__dirname, process.env.DEV_CONFIG_FILE);
 }
-
 
 console.log(docFileDir, targetDir, 'dirPath');
 
