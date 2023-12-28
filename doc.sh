@@ -42,5 +42,8 @@ sync_and_listen() {
   fi
 }
 
-# 初始执行
-sync_and_listen
+# 无限循环，确保脚本持续执行
+while true; do
+  # 初始执行
+  sync_and_listen
+done
