@@ -133,30 +133,22 @@ async function init() {
   await fs.writeFile(configDir, "[]", 'utf-8', (err) => {
     console.log(err);
   });
-  async function deleteFilesInDirectory(directoryPath) {
+
+  async function deleteAndCreateFolder(folderToDelete, newFolderToCreate) {
     try {
-      const files = await readDir(directoryPath); // 使用 fs.promises.readdir 读取目录内容
-      for (const file of files) {
-        const filePath = path.join(directoryPath, file); // 获取文件路径
-        fs.unlink(filePath, (unlinkErr) => {
-          if (unlinkErr) {
-            console.error(`Error deleting file ${filePath}:`, unlinkErr);
-            return;
-          }
-          console.log(`File ${filePath} deleted.`);
-        });
-        console.log(`File ${filePath} deleted.`);
-      }
-      console.log(`All files in ${directoryPath} deleted successfully.`);
+      // 删除文件夹
+      await fs.rm(folderToDelete, { recursive: true }, () => { });
+      console.log(`Folder ${folderToDelete} deleted successfully.`);
+
+      // 创建新文件夹
+      await fs.mkdir(newFolderToCreate, {recursive:true}, () => { });
+      console.log(`Folder ${newFolderToCreate} created successfully.`);
     } catch (err) {
       console.error('Error:', err);
     }
   }
-  await deleteFilesInDirectory(mdDir).then(() => {
-    console.log('删除md文件成功')
-  }).catch(e => {
-    console.log('删除md文件失败', e)
-  });
+
+  await deleteAndCreateFolder(mdDir, mdDir);
 }
 
 
