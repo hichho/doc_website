@@ -8,15 +8,19 @@ const util = require('util');
 const { projectConfig, imageFolderPath, positionToInsert, template, imageType } = constants;
 //html->md 工具
 const turndownService = new turndown();
+const readDir = util.promisify(fs.readdir);
+
 
 let docFileDir = '/var/project/doc_website/docFile';
 let targetDir = '/var/project/doc_website/docs/doc_';
 let configDir = '/var/project/doc_website/script/navConfig.json';
+let mdDir = '/var/project/doc_website/docs';
 
 if (process.env.NODE_ENV === 'development') {
   docFileDir = path.resolve(__dirname, process.env.DEV_DOC_DIR);
   targetDir = path.resolve(__dirname, process.env.DEV_TARGET_DIR);
   configDir = path.resolve(__dirname, process.env.DEV_CONFIG_FILE);
+  mdDir = path.resolve(__dirname, process.env.DEV_MD_DIR);
 }
 
 
@@ -79,7 +83,6 @@ async function mergeConfig() {
   let fileNames = [];
   //配置
   let config = [];
-  const readDir = util.promisify(fs.readdir);
   try {
     //查找doc目录下的所有word文档
     const files = await readDir(docFileDir);
@@ -126,10 +129,41 @@ async function productDumiConfig(configs) {
   }
 }
 
+async function init() {
+  await fs.writeFile(configDir, "[]", 'utf-8', (err) => {
+    console.log(err);
+  });
+  async function deleteFilesInDirectory(directoryPath) {
+    try {
+      const files = await readDir(directoryPath); // 使用 fs.promises.readdir 读取目录内容
+      for (const file of files) {
+        const filePath = path.join(directoryPath, file); // 获取文件路径
+        fs.unlink(filePath, (unlinkErr) => {
+          if (unlinkErr) {
+            console.error(`Error deleting file ${filePath}:`, unlinkErr);
+            return;
+          }
+          console.log(`File ${filePath} deleted.`);
+        });
+        console.log(`File ${filePath} deleted.`);
+      }
+      console.log(`All files in ${directoryPath} deleted successfully.`);
+    } catch (err) {
+      console.error('Error:', err);
+    }
+  }
+  await deleteFilesInDirectory(mdDir).then(() => {
+    console.log('删除md文件成功')
+  }).catch(e => {
+    console.log('删除md文件失败', e)
+  });
+}
+
 
 // 修正代码
 async function processFiles() {
   try {
+    await init();
     const configs = await mergeConfig();
     const projectConvertPromiseFn = configs.map(async (item) => {
       try {
