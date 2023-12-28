@@ -58,12 +58,11 @@ async function convertDocToMd(docPath, outputPath) {
     } catch (e) {
       console.log(e, 'word转html时发生错误');
     }
-    console.log('html结果', result, 'html结果')
 
     let htmlContent = result.value;
     const html = template.slice(0, positionToInsert) + htmlContent + template.slice(positionToInsert);
     const markdownContent = turndownService.turndown(html);
-    await fs.writeFileSync(outputPath + '/index.md', markdownContent, 'utf-8', turndownService.turndown(html), 'utf-8', (err) => {
+    await fs.writeFileSync(outputPath + '/index.md', markdownContent, (err) => {
       if (err) {
         console.error('写入发生错误', err);
       } else {
@@ -130,25 +129,31 @@ async function productDumiConfig(configs) {
 }
 
 async function init() {
-  await fs.writeFile(configDir, "[]", 'utf-8', (err) => {
-    console.log(err);
-  });
 
-  async function deleteAndCreateFolder(folderToDelete, newFolderToCreate) {
-    try {
-      // 删除文件夹
-      await fs.rm(folderToDelete, { recursive: true }, () => { });
-      console.log(`Folder ${folderToDelete} deleted successfully.`);
-
-      // 创建新文件夹
-      await fs.mkdir(newFolderToCreate, {recursive:true}, () => { });
-      console.log(`Folder ${newFolderToCreate} created successfully.`);
-    } catch (err) {
-      console.error('Error:', err);
-    }
+  function deleteFolderContents(folderPath) {
+    // 获取文件夹内的所有文件和子文件夹
+    const files = fs.readdirSync(folderPath);
+  
+    // 遍历文件和子文件夹
+    files.forEach((file) => {
+      const filePath = path.join(folderPath, file);
+  
+      // 检查文件类型
+      const stats = fs.statSync(filePath);
+      if (stats.isFile()) {
+        // 删除文件
+        fs.unlinkSync(filePath);
+      } else if (stats.isDirectory()) {
+        // 递归删除子文件夹的内容
+        deleteFolderContents(filePath);
+        // 删除空的子文件夹
+        fs.rmdirSync(filePath);
+      }
+    });
   }
+  
+await  deleteFolderContents(mdDir);
 
-  await deleteAndCreateFolder(mdDir, mdDir);
 }
 
 
